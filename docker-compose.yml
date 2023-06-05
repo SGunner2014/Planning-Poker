@@ -1,0 +1,42 @@
+services:
+  backend:
+    depends_on:
+      - mariadb
+    environment:
+      ENVIRONMENT: development
+      MYSQL_HOST: mariadb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: pass
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: 'planning-poker'
+    ports:
+      - 3001:3000
+    volumes:
+      - ./backend:/app
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+  frontend:
+    environment:
+      ENVIRONMENT: development
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: 'planning-poker'
+    ports:
+      - 3306:3306
+    volumes:
+      - mariadb:/var/lib/mariadb
+
+volumes:
+  mariadb:
