@@ -1,5 +1,5 @@
 interface VotingCardProps {
-  amount: number;
+  amount: string;
 }
 
 export const VotingCard = ({ amount }: VotingCardProps) => {
