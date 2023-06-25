@@ -1,10 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       backgroundImage: {
@@ -12,9 +8,13 @@ module.exports = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      boxShadow: {
+        "poker-card": "4px 4px 12px 0px rgba(0, 0, 0, 0.25)",
+        "poker-card-2": "8px 8px 12px 0px rgba(0, 0, 0, 0.25)",
+      },
       colors: {
-        primary: "#31393C",
-        secondary: "#2176FF",
+        "poker-gray": "#D6D7D8",
+        "poker-gray-2": "#E8E8E8",
       },
     },
   },

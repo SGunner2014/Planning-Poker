@@ -1,13 +1,15 @@
 interface VotingCardProps {
-  amount: string;
+  points: string;
+  onClick: () => void;
 }
 
-export const VotingCard = ({ amount }: VotingCardProps) => {
+export const VotingCard = ({ points, onClick }: VotingCardProps) => {
   return (
-    <div className="flex justify-center items-center">
-      <div className="w-24 h-28 bg-slate-600 hover:bg-slate-700 cursor-pointer rounded-xl flex justify-center items-center">
-        <span className="text-5xl text-white">{amount}</span>
-      </div>
+    <div
+      onClick={onClick}
+      className="flex w-[120px] h-[160px] p-2 justify-center items-center bg-poker-gray cursor-pointer rounded-xl shadow-poker-card hover:shadow-poker-card-2 transition-all"
+    >
+      <h1 className="text-5xl font-semibold">{points}</h1>
     </div>
   );
 };
