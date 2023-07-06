@@ -9,8 +9,9 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { Socket } from 'socket.io';
+import { RoomDto } from './dto/room.dto';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class RoomGateway {
   constructor(private readonly roomService: RoomService) {}
 
@@ -19,7 +20,21 @@ export class RoomGateway {
     @MessageBody() joinRoomDto: JoinRoomDto,
     @ConnectedSocket() client: Socket,
   ) {
-    return this.roomService.joinRoom(joinRoomDto, client);
+    const [room, userId] = this.roomService.joinRoom(joinRoomDto, client);
+    this.roomService.broadcast(
+      room.id,
+      MessageTypes.USER_JOINED,
+      {
+        username: joinRoomDto.username,
+        userId: userId,
+      },
+      [userId],
+    );
+
+    return {
+      room: RoomDto.fromRoom(room),
+      userId,
+    };
   }
 
   @SubscribeMessage(MessageTypes.CREATE_ROOM)
@@ -27,6 +42,11 @@ export class RoomGateway {
     @MessageBody() createRoomDto: CreateRoomDto,
     @ConnectedSocket() client: Socket,
   ) {
-    return this.roomService.createRoom(createRoomDto, client);
+    const [room, userId] = this.roomService.createRoom(createRoomDto, client);
+
+    return {
+      room: RoomDto.fromRoom(room),
+      userId,
+    };
   }
 }

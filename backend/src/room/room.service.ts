@@ -8,31 +8,31 @@ import { Socket } from 'socket.io';
 
 @Injectable()
 export class RoomService {
-  private rooms: Record<string, Room> = {};
+  private static rooms: Record<string, Room> = {};
 
   /**
    * Creates a new room
-   *
-   * @param param0
-   * @returns
    */
-  public createRoom({ username }: CreateRoomDto, client: Socket) {
+  public createRoom(
+    { username }: CreateRoomDto,
+    client: Socket,
+  ): [Room, string] {
     const userId = this.generateId();
     const roomId = this.generateShortId();
 
-    const newRoom: Room = {
-      id: userId,
+    const newRoom = new Room({
+      id: roomId,
       ownerId: userId,
       latestUserId: 0,
       usernameFromIdMap: {
         0: username,
       },
       users: [{ id: this.generateId(), username, client }],
-    };
+    });
 
-    this.rooms[roomId] = newRoom;
+    RoomService.rooms[roomId] = newRoom;
 
-    return roomId;
+    return [newRoom, userId];
   }
 
   /**
@@ -40,20 +40,24 @@ export class RoomService {
    *
    * @param param0
    */
-  public joinRoom({ username, roomId }: JoinRoomDto, client: Socket) {
+  public joinRoom(
+    { username, roomId }: JoinRoomDto,
+    client: Socket,
+  ): [Room, string] {
     const userId = this.generateId();
 
-    const room = this.rooms[roomId];
+    const room = RoomService.rooms[roomId];
 
     if (!room) {
-      throw new Error('Room not found');
+      console.log(RoomService.rooms);
+      throw new Error('Room not found: ' + roomId);
     }
 
     room.users.push({ id: userId, username, client });
     room.latestUserId += 1;
     room.usernameFromIdMap[room.latestUserId] = username;
 
-    return room;
+    return [room, userId];
   }
 
   /**
@@ -64,14 +68,14 @@ export class RoomService {
    * @param data
    * @param except
    */
-  public broadcast(
+  public static broadcast(
     roomId: string,
     messageType: MessageTypes,
     data: any,
     except?: string[],
   ) {
     const exceptIds = except || [];
-    const room = this.rooms[roomId];
+    const room = RoomService.rooms[roomId];
 
     if (!room) {
       throw new Error('Room not found');
@@ -90,5 +94,44 @@ export class RoomService {
 
   private generateId() {
     return uuid();
+  }
+
+  private static onClientDisconnect(
+    client: Socket,
+    roomId: string,
+    userId: string,
+  ) {
+    const room = RoomService.rooms[roomId];
+
+    if (!room) {
+      throw new Error('Room not found');
+    }
+
+    const user = room.users.find((user) => user.id === userId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    room.users = room.users.filter((user) => user.id !== userId);
+
+    if (room.users.length === 0) {
+      delete RoomService.rooms[roomId];
+      return;
+    }
+
+    if (room.ownerId === userId) {
+      room.ownerId = room.users[0].id;
+    }
+
+    RoomService.broadcast(
+      roomId,
+      MessageTypes.USER_LEFT,
+      {
+        userId,
+        ownerId: room.ownerId,
+      },
+      [userId],
+    );
   }
 }

@@ -1,11 +1,13 @@
+import { Player } from "@/utils/types";
 import React, { createContext } from "react";
 
 export type AppStateType = {
   inRoom: boolean;
   roomId?: string;
   isHost?: boolean;
+  userId?: string;
   username?: string;
-  players?: string[];
+  players?: Player[];
 };
 
 type AppAction =
@@ -19,11 +21,20 @@ type AppAction =
     }
   | {
       type: "setUsername";
-      username?: string;
+      userId: string;
+      username: string;
     }
   | {
       type: "setPlayers";
-      players?: string[];
+      players?: Player[];
+    }
+  | {
+      type: "addPlayer";
+      player: Player;
+    }
+  | {
+      type: "removePlayer";
+      id: string;
     };
 
 const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
@@ -45,12 +56,23 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
     case "setUsername":
       return {
         ...state,
+        userId: action.userId,
         username: action.username,
       };
     case "setPlayers":
       return {
         ...state,
         players: action.players,
+      };
+    case "addPlayer":
+      return {
+        ...state,
+        players: [...(state.players ?? []), action.player],
+      };
+    case "removePlayer":
+      return {
+        ...state,
+        players: state.players?.filter((player) => player.id !== action.id),
       };
     default:
       return state;

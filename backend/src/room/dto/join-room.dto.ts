@@ -1,9 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class JoinRoomDto {
   @IsString()
-  username: string;
+  @IsNotEmpty()
+  public username: string;
 
   @IsString()
-  roomId: string;
+  @IsNotEmpty()
+  public roomId: string;
 }

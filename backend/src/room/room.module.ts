@@ -3,6 +3,6 @@ import { RoomGateway } from './room.gateway';
 import { RoomService } from './room.service';
 
 @Module({
-  providers: [RoomGateway, RoomService]
+  providers: [RoomGateway, RoomService],
 })
 export class RoomModule {}

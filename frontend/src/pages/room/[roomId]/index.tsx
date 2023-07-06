@@ -1,20 +1,23 @@
+import { EnterUsernamePrompt } from "@/components/EnterUsernamePrompt";
+import { RoomEventHandler } from "@/components/RoomEventHandler";
 import { VotingCard } from "@/components/VotingCard";
+import { useApp } from "@/context/AppContext";
 import { RootLayout } from "@/layout/RootLayout";
 import { Sidebar } from "@/layout/Sidebar";
 import _, { chunk } from "lodash-es";
 
-const players = [
-  {
-    id: "1",
-    name: "Player 1",
-  },
-];
-
 const votingOptions = [0, 1, 2, 3, 5, 8, 13, "?"];
 
 const Room = () => {
+  const { state } = useApp();
+
+  if (!state.username) {
+    return <EnterUsernamePrompt />;
+  }
+
   return (
     <RootLayout>
+      <RoomEventHandler />
       <div className="flex-1 flex h-screen items-center">
         <div className="flex flex-col justify-center items-center gap-12 w-full">
           <h1 className="text-5xl font-semibold text-center">
@@ -36,7 +39,7 @@ const Room = () => {
           ))}
         </div>
       </div>
-      <Sidebar players={players} />
+      <Sidebar players={state.players!} />
     </RootLayout>
   );
 };
