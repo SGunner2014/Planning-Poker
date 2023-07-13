@@ -13,7 +13,7 @@ import { RoomDto } from './dto/room.dto';
 
 @WebSocketGateway({ cors: true })
 export class RoomGateway {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(private readonly roomService: RoomService) { }
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
   handleJoinRoom(
@@ -21,7 +21,7 @@ export class RoomGateway {
     @ConnectedSocket() client: Socket,
   ) {
     const [room, userId] = this.roomService.joinRoom(joinRoomDto, client);
-    this.roomService.broadcast(
+    RoomService.broadcast(
       room.id,
       MessageTypes.USER_JOINED,
       {

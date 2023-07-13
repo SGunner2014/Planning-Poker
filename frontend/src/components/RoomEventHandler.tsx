@@ -16,8 +16,17 @@ export const RoomEventHandler = () => {
       });
     });
 
+    socket.on("userLeft", ({ userId, ownerId }) => {
+      updateApp({
+        type: "removePlayer",
+        userId,
+        ownerId
+      })
+    });
+
     return () => {
       socket.off("userJoined");
+      socket.off("userLeft");
     };
   }, []);
 

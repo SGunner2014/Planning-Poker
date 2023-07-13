@@ -12,30 +12,31 @@ export type AppStateType = {
 
 type AppAction =
   | {
-      type: "joinRoom";
-      roomId: string;
-      isHost: boolean;
-    }
+    type: "joinRoom";
+    roomId: string;
+    isHost: boolean;
+  }
   | {
-      type: "leaveRoom";
-    }
+    type: "leaveRoom";
+  }
   | {
-      type: "setUsername";
-      userId: string;
-      username: string;
-    }
+    type: "setUsername";
+    userId: string;
+    username: string;
+  }
   | {
-      type: "setPlayers";
-      players?: Player[];
-    }
+    type: "setPlayers";
+    players?: Player[];
+  }
   | {
-      type: "addPlayer";
-      player: Player;
-    }
+    type: "addPlayer";
+    player: Player;
+  }
   | {
-      type: "removePlayer";
-      id: string;
-    };
+    type: "removePlayer";
+    userId: string;
+    ownerId: string;
+  };
 
 const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
   switch (action.type) {
@@ -72,7 +73,8 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
     case "removePlayer":
       return {
         ...state,
-        players: state.players?.filter((player) => player.id !== action.id),
+        players: state.players?.filter((player) => player.id !== action.userId),
+        isHost: action.ownerId === state.userId,
       };
     default:
       return state;
@@ -88,7 +90,7 @@ export const AppContext = createContext<{
   updateApp: React.Dispatch<AppAction>;
 }>({
   state: defaultValues,
-  updateApp: () => {},
+  updateApp: () => { },
 });
 
 interface Props {

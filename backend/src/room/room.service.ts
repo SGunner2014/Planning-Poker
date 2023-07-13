@@ -1,6 +1,6 @@
 import { uuid } from 'uuidv4';
 import { Injectable } from '@nestjs/common';
-import { Room } from './classes/Room';
+import { Room, User } from './classes/Room';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { MessageTypes } from 'src/enums/MessageTypes';
@@ -9,6 +9,7 @@ import { Socket } from 'socket.io';
 @Injectable()
 export class RoomService {
   private static rooms: Record<string, Room> = {};
+  private static userToRoomMap: Record<string, string> = {};
 
   /**
    * Creates a new room
@@ -27,10 +28,11 @@ export class RoomService {
       usernameFromIdMap: {
         0: username,
       },
-      users: [{ id: this.generateId(), username, client }],
+      users: [new User({ id: this.generateId(), username, client })],
     });
 
     RoomService.rooms[roomId] = newRoom;
+    RoomService.userToRoomMap[userId] = roomId;
 
     return [newRoom, userId];
   }
@@ -53,11 +55,42 @@ export class RoomService {
       throw new Error('Room not found: ' + roomId);
     }
 
-    room.users.push({ id: userId, username, client });
+    room.users.push(new User({ id: userId, username, client }));
     room.latestUserId += 1;
     room.usernameFromIdMap[room.latestUserId] = username;
+    RoomService.userToRoomMap[userId] = roomId;
 
     return [room, userId];
+  }
+
+  public static handleUserDisconnect(userId: string) {
+    const roomId = RoomService.userToRoomMap[userId];
+
+    console.log('user id: ' + userId);
+    console.log(RoomService.userToRoomMap);
+
+    if (!roomId) {
+      throw new Error('Room not found');
+    }
+
+    RoomService.rooms[roomId].users = RoomService.rooms[roomId].users.filter(
+      (user) => user.id !== userId,
+    );
+
+    if (RoomService.rooms[roomId].users.length === 0) {
+      delete RoomService.rooms[roomId];
+      console.log('deleting room');
+      return;
+    }
+
+    if (RoomService.rooms[roomId].ownerId === userId) {
+      RoomService.rooms[roomId].ownerId = RoomService.rooms[roomId].users[0].id;
+    }
+
+    RoomService.broadcast(roomId, MessageTypes.USER_LEFT, {
+      userId,
+      ownerId: RoomService.rooms[roomId].ownerId,
+    });
   }
 
   /**
@@ -94,44 +127,5 @@ export class RoomService {
 
   private generateId() {
     return uuid();
-  }
-
-  private static onClientDisconnect(
-    client: Socket,
-    roomId: string,
-    userId: string,
-  ) {
-    const room = RoomService.rooms[roomId];
-
-    if (!room) {
-      throw new Error('Room not found');
-    }
-
-    const user = room.users.find((user) => user.id === userId);
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    room.users = room.users.filter((user) => user.id !== userId);
-
-    if (room.users.length === 0) {
-      delete RoomService.rooms[roomId];
-      return;
-    }
-
-    if (room.ownerId === userId) {
-      room.ownerId = room.users[0].id;
-    }
-
-    RoomService.broadcast(
-      roomId,
-      MessageTypes.USER_LEFT,
-      {
-        userId,
-        ownerId: room.ownerId,
-      },
-      [userId],
-    );
   }
 }
