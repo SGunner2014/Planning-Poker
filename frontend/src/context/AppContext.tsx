@@ -1,42 +1,65 @@
 import { Player } from "@/utils/types";
 import React, { createContext } from "react";
 
+export enum RoomState {
+  Voting = "voting",
+  Lobby = "lobby",
+  Review = "review",
+}
+
 export type AppStateType = {
   inRoom: boolean;
+  state: RoomState;
   roomId?: string;
   isHost?: boolean;
+  hostId?: string;
   userId?: string;
   username?: string;
   players?: Player[];
+  votedPlayers?: Set<string>;
+  playerVotes?: Record<string, number | string>;
 };
 
 type AppAction =
   | {
-    type: "joinRoom";
-    roomId: string;
-    isHost: boolean;
-  }
+      type: "joinRoom";
+      roomId: string;
+      isHost: boolean;
+    }
   | {
-    type: "leaveRoom";
-  }
+      type: "leaveRoom";
+    }
   | {
-    type: "setUsername";
-    userId: string;
-    username: string;
-  }
+      type: "setUsername";
+      userId: string;
+      username: string;
+    }
   | {
-    type: "setPlayers";
-    players?: Player[];
-  }
+      type: "setPlayers";
+      players: Player[];
+      hostId: string;
+    }
   | {
-    type: "addPlayer";
-    player: Player;
-  }
+      type: "addPlayer";
+      player: Player;
+    }
   | {
-    type: "removePlayer";
-    userId: string;
-    ownerId: string;
-  };
+      type: "removePlayer";
+      userId: string;
+      ownerId: string;
+    }
+  | {
+      type: "setRoomState";
+      state: RoomState;
+    }
+  | {
+      type: "setPlayerVoted";
+      userId: string;
+    }
+  | {
+      type: "setPlayerVotes";
+      playerVotes: Record<string, number | string>;
+    };
 
 const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
   switch (action.type) {
@@ -64,6 +87,7 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
       return {
         ...state,
         players: action.players,
+        hostId: action.hostId,
       };
     case "addPlayer":
       return {
@@ -76,6 +100,21 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
         players: state.players?.filter((player) => player.id !== action.userId),
         isHost: action.ownerId === state.userId,
       };
+    case "setRoomState":
+      return {
+        ...state,
+        state: action.state,
+      };
+    case "setPlayerVoted":
+      return {
+        ...state,
+        votedPlayers: new Set(state.votedPlayers ?? []).add(action.userId),
+      };
+    case "setPlayerVotes":
+      return {
+        ...state,
+        playerVotes: action.playerVotes,
+      };
     default:
       return state;
   }
@@ -83,6 +122,7 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
 
 const defaultValues: AppStateType = {
   inRoom: false,
+  state: RoomState.Lobby,
 };
 
 export const AppContext = createContext<{
@@ -90,7 +130,7 @@ export const AppContext = createContext<{
   updateApp: React.Dispatch<AppAction>;
 }>({
   state: defaultValues,
-  updateApp: () => { },
+  updateApp: () => {},
 });
 
 interface Props {

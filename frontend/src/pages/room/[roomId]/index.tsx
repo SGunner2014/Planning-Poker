@@ -1,12 +1,13 @@
 import { EnterUsernamePrompt } from "@/components/EnterUsernamePrompt";
 import { RoomEventHandler } from "@/components/RoomEventHandler";
 import { VotingCard } from "@/components/VotingCard";
+import { LobbyRoom } from "@/containers/room/LobbyRoom";
+import { ReviewRoom } from "@/containers/room/ReviewRoom";
+import { VotingRoom } from "@/containers/room/VotingRoom";
 import { useApp } from "@/context/AppContext";
 import { RootLayout } from "@/layout/RootLayout";
 import { Sidebar } from "@/layout/Sidebar";
 import _, { chunk } from "lodash-es";
-
-const votingOptions = [0, 1, 2, 3, 5, 8, 13, "?"];
 
 const Room = () => {
   const { state } = useApp();
@@ -18,27 +19,9 @@ const Room = () => {
   return (
     <RootLayout>
       <RoomEventHandler />
-      <div className="flex-1 flex h-screen items-center">
-        <div className="flex flex-col justify-center items-center gap-12 w-full">
-          <h1 className="text-5xl font-semibold text-center">
-            Select an estimate
-          </h1>
-          {chunk(votingOptions, 5).map((options, index) => (
-            <div
-              key={`options-${index}`}
-              className="flex w-full justify-center items-center px-32 first-of-type:pt-5 last-of-type:pb-5 flex-wrap gap-10"
-            >
-              {options.map((option) => (
-                <VotingCard
-                  key={option}
-                  points={option.toString()}
-                  onClick={() => {}}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
+      {state.state === "lobby" && <LobbyRoom />}
+      {state.state === "voting" && <VotingRoom />}
+      {state.state === "review" && <ReviewRoom />}
       <Sidebar players={state.players!} />
     </RootLayout>
   );

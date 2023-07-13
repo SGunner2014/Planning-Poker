@@ -34,6 +34,7 @@ export const EnterUsernamePrompt = () => {
           updateApp({
             type: "setPlayers",
             players: room.users,
+            hostId: room.ownerId,
           });
         });
     });

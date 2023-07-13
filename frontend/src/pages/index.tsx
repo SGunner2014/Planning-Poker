@@ -30,6 +30,7 @@ const Home = () => {
           updateApp({
             type: "setPlayers",
             players: room.users,
+            hostId: userId,
           });
 
           router.push(`/room/${room.id}`);

@@ -7,7 +7,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ players }: SidebarProps) => {
   return (
-    <div className="w-80 h-screen bg-poker-gray">
+    <div className="w-80 h-screen bg-neutral">
       <div className="py-10">
         <h1 className="text-xl font-semibold text-center mb-[50px]">Players</h1>
         <div className="h-max-[300px] overflow-y-auto">

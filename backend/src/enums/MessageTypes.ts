@@ -5,4 +5,10 @@ export enum MessageTypes {
   CREATE_ROOM_RESPONSE = 'createRoomResponse',
   USER_JOINED = 'userJoined',
   USER_LEFT = 'userLeft',
+  START_VOTING = 'startVoting',
+  VOTE = 'vote',
+  USER_VOTED = 'userVoted',
+  VOTING_STARTED = 'votingStarted',
+  REVEAL_CARDS = 'revealCards',
+  CARDS_REVEALED = 'cardsRevealed',
 }
