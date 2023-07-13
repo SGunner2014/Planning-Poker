@@ -46,13 +46,25 @@ const Home = () => {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-poker-gray">
-      <SunkenInput
+    <div className="w-screen h-screen flex flex-col justify-center items-center bg-poker-gray">
+      {/* <SunkenInput
         required
         label="Enter your name"
         fieldRef={usernameRef}
         onFinish={() => onSubmit()}
-      />
+      /> */}
+      <div className="flex flex-col">
+        <h2 className="font-medium text-[20px] mb-2">Enter your name</h2>
+        <input
+          type="text"
+          ref={usernameRef}
+          placeholder="Type here"
+          className="input input-bordered max-w-xs w-72"
+        />
+        <button className="btn btn-primary mt-4" onClick={() => onSubmit()}>
+          Submit
+        </button>
+      </div>
     </div>
   );
 };

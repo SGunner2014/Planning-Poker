@@ -3,22 +3,22 @@ import {
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
-} from '@nestjs/websockets';
-import { MessageTypes } from 'src/enums/MessageTypes';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { RoomService } from './room.service';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { Socket } from 'socket.io';
-import { RoomDto } from './dto/room.dto';
+} from "@nestjs/websockets";
+import { MessageTypes } from "src/enums/MessageTypes";
+import { JoinRoomDto } from "./dto/join-room.dto";
+import { RoomService } from "./room.service";
+import { CreateRoomDto } from "./dto/create-room.dto";
+import { Socket } from "socket.io";
+import { RoomDto } from "./dto/room.dto";
 
 @WebSocketGateway({ cors: true })
 export class RoomGateway {
-  constructor(private readonly roomService: RoomService) { }
+  constructor(private readonly roomService: RoomService) {}
 
   @SubscribeMessage(MessageTypes.JOIN_ROOM)
   handleJoinRoom(
     @MessageBody() joinRoomDto: JoinRoomDto,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: Socket
   ) {
     const [room, userId] = this.roomService.joinRoom(joinRoomDto, client);
     RoomService.broadcast(
@@ -28,7 +28,7 @@ export class RoomGateway {
         username: joinRoomDto.username,
         userId: userId,
       },
-      [userId],
+      [userId]
     );
 
     return {
@@ -40,7 +40,7 @@ export class RoomGateway {
   @SubscribeMessage(MessageTypes.CREATE_ROOM)
   handleCreateRoom(
     @MessageBody() createRoomDto: CreateRoomDto,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: Socket
   ) {
     const [room, userId] = this.roomService.createRoom(createRoomDto, client);
 
