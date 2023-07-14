@@ -2,7 +2,7 @@ import { SunkenInput } from "@/components/input/SunkenInput";
 import { useApp } from "@/context/AppContext";
 import { socket } from "@/utils/socket";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 const Home = () => {
   const router = useRouter();
@@ -42,29 +42,26 @@ const Home = () => {
     };
   }, []);
 
-  const onSubmit = () => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     socket.connect();
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col justify-center items-center bg-poker-gray">
-      {/* <SunkenInput
-        required
-        label="Enter your name"
-        fieldRef={usernameRef}
-        onFinish={() => onSubmit()}
-      /> */}
+    <div className="w-screen h-screen flex flex-col justify-center items-center">
       <div className="flex flex-col">
         <h2 className="font-medium text-[20px] mb-2">Enter your name</h2>
-        <input
-          type="text"
-          ref={usernameRef}
-          placeholder="Type here"
-          className="input input-bordered max-w-xs w-72"
-        />
-        <button className="btn btn-primary mt-4" onClick={() => onSubmit()}>
-          Submit
-        </button>
+        <form onSubmit={(e) => onSubmit(e)} className="flex flex-col">
+          <input
+            type="text"
+            ref={usernameRef}
+            placeholder="Type here"
+            className="input input-bordered max-w-xs w-72"
+          />
+          <button className="btn btn-primary mt-4" type="submit">
+            Submit
+          </button>
+        </form>
       </div>
     </div>
   );

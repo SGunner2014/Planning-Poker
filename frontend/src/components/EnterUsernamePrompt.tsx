@@ -1,6 +1,5 @@
-import { useEffect, useRef } from "react";
+import { FormEvent, useEffect, useRef } from "react";
 import { Modal } from "./Modal";
-import { SunkenInput } from "./input/SunkenInput";
 import { useApp } from "@/context/AppContext";
 import { socket } from "@/utils/socket";
 import { useRouter } from "next/router";
@@ -44,21 +43,27 @@ export const EnterUsernamePrompt = () => {
     };
   }, [roomId]);
 
-  const handleUsernameEntryFinish = () => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     socket.connect();
   };
 
   return (
-    <Modal>
-      <h1 className="text-xl font-semibold">Enter a username</h1>
-      <p>To enter this room, you must choose a username:</p>
-      <div className="flex flex-col gap-2 mt-5">
-        <SunkenInput
-          label="Username"
-          fieldRef={usernameRef}
-          onFinish={() => handleUsernameEntryFinish()}
-        />
+    <div className="w-screen h-screen flex flex-col justify-center items-center">
+      <div className="flex flex-col">
+        <h1 className="text-xl font-semibold">Enter your name</h1>
+        <form onSubmit={(e) => onSubmit(e)} className="flex flex-col">
+          <input
+            type="text"
+            ref={usernameRef}
+            placeholder="Type here"
+            className="input input-bordered max-w-xs w-72"
+          />
+          <button className="btn btn-primary mt-4" type="submit">
+            Submit
+          </button>
+        </form>
       </div>
-    </Modal>
+    </div>
   );
 };
