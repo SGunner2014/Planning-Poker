@@ -1,7 +1,7 @@
 import { chunk } from "lodash-es";
 import { VotingCard } from "@/components/VotingCard";
 import { socket } from "@/utils/socket";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useApp } from "@/context/AppContext";
 
 const votingOptions = [0, 1, 2, 3, 5, 8, 13, "?"];
@@ -12,7 +12,7 @@ export const VotingRoom = () => {
   const allPlayersVoted = state.votedPlayers?.size === state.players?.length;
 
   const handleRevealCardsClick = () => {
-    socket.emit("revealCards");
+    socket.emit("revealCards", { roomId: state.roomId });
   };
 
   const [votingCardSelected, setVotingCardSelected] = useState<
