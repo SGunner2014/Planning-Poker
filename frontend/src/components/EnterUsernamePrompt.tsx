@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useRef } from "react";
-import { Modal } from "./Modal";
 import { useApp } from "@/context/AppContext";
 import { socket } from "@/utils/socket";
 import { useRouter } from "next/router";

@@ -1,7 +1,7 @@
 interface VotingCardProps {
   points: string;
-  selected: boolean;
-  onClick: () => void;
+  selected?: boolean;
+  onClick?: () => void;
 }
 
 export const VotingCard = ({ points, selected, onClick }: VotingCardProps) => {

@@ -1,6 +1,5 @@
 import { EnterUsernamePrompt } from "@/components/EnterUsernamePrompt";
 import { RoomEventHandler } from "@/components/RoomEventHandler";
-import { VotingCard } from "@/components/VotingCard";
 import { LobbyRoom } from "@/containers/room/LobbyRoom";
 import { ReviewRoom } from "@/containers/room/ReviewRoom";
 import { VotingRoom } from "@/containers/room/VotingRoom";
