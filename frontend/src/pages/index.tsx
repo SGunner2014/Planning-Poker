@@ -1,7 +1,7 @@
 import { useApp } from "@/context/AppContext";
 import { socket } from "@/utils/socket";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef } from "react";
 
 const Home = () => {
   const router = useRouter();
@@ -14,8 +14,6 @@ const Home = () => {
       socket
         .emitWithAck("createRoom", { username: usernameRef.current?.value })
         .then(({ room, userId }) => {
-          console.log("username", usernameRef.current?.value);
-
           updateApp({
             type: "setUsername",
             userId,

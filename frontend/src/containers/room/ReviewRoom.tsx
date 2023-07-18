@@ -1,5 +1,6 @@
 import { ReviewCard } from "@/components/ReviewCard";
 import { useApp } from "@/context/AppContext";
+import { socket } from "@/utils/socket";
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { useEffect, useMemo, useState } from "react";
 import { Pie } from "react-chartjs-2";
@@ -80,6 +81,10 @@ export const ReviewRoom = () => {
     return values.every((val) => val === first);
   }, [state.playerVotes]);
 
+  const handleNextRoundClick = () => {
+    socket.emit("startVoting", { roomId: state.roomId });
+  };
+
   return (
     <>
       <div className="flex-1 flex justify-center items-center py-32">
@@ -109,6 +114,16 @@ export const ReviewRoom = () => {
                 />
               ))}
           </div>
+          {state.isHost && (
+            <div className="flex flex-col justify-center items-center">
+              <button
+                className="btn btn-primary"
+                onClick={() => handleNextRoundClick()}
+              >
+                Next Round
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {allAgreed && (

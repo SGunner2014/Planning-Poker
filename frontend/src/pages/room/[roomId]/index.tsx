@@ -6,10 +6,9 @@ import { VotingRoom } from "@/containers/room/VotingRoom";
 import { useApp } from "@/context/AppContext";
 import { RootLayout } from "@/layout/RootLayout";
 import { Sidebar } from "@/layout/Sidebar";
-import _, { chunk } from "lodash-es";
 
 const Room = () => {
-  const { state } = useApp();
+  const { state, updateApp } = useApp();
 
   if (!state.username) {
     return <EnterUsernamePrompt />;

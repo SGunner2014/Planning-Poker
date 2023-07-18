@@ -22,6 +22,12 @@ export type AppStateType = {
 
 type AppAction =
   | {
+      type: "resetApp";
+    }
+  | {
+      type: "resetPlayerVoted";
+    }
+  | {
       type: "joinRoom";
       roomId: string;
       isHost: boolean;
@@ -99,6 +105,7 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
         ...state,
         players: state.players?.filter((player) => player.id !== action.userId),
         isHost: action.ownerId === state.userId,
+        hostId: action.ownerId,
       };
     case "setRoomState":
       return {
@@ -110,10 +117,19 @@ const appReducer = (state: AppStateType, action: AppAction): AppStateType => {
         ...state,
         votedPlayers: new Set(state.votedPlayers ?? []).add(action.userId),
       };
+    case "resetPlayerVoted":
+      return {
+        ...state,
+        votedPlayers: undefined,
+      };
     case "setPlayerVotes":
       return {
         ...state,
         playerVotes: action.playerVotes,
+      };
+    case "resetApp":
+      return {
+        ...defaultValues,
       };
     default:
       return state;

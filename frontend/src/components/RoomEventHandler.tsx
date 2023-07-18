@@ -29,6 +29,13 @@ export const RoomEventHandler = () => {
         type: "setRoomState",
         state: RoomState.Voting,
       });
+      updateApp({
+        type: "setPlayerVotes",
+        playerVotes: {},
+      });
+      updateApp({
+        type: "resetPlayerVoted",
+      });
     });
 
     socket.on("userVoted", ({ userId }) => {
