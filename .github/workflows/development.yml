@@ -25,7 +25,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - run: |
-          AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+          AWS_VERSION_LABEL="${{env.APP_NAME}}-${{env.PIPELINE_ID}}"
 
           echo "Creating source bundle"
           cd backend
