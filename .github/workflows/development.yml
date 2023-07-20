@@ -1,0 +1,71 @@
+name: development-deployment
+
+env:
+  APP_NAME: "Planning poker"
+  ENV_NAME: "Planningpoker-env"
+  S3_BUCKET: "elasticbeanstalk-us-east-1-448561077416"
+  AWS_REGION: us-east-1
+  AWS_PLATFORM: Docker
+  PIPELINE_ID: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_eb_version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+
+          echo "Creating source bundle"
+          cd backend
+          zip -r ${{env.APP_NAME}}.zip ./src Dockerfile package.json tsconfig.build.json yarn.lock tsconfig.json
+          S3_KEY="$AWS_VERSION_LABEL.zip"
+
+          echo "Uploading source bundle to S3"
+          aws s3 cp ${{env.APP_NAME}}.zip s3://${{env.S3_BUCKET}}/$S3_KEY --region ${{env.AWS_REGION}}
+
+          echo "Creating new application version"
+          aws elasticbeanstalk create-application-version --application-name ${{env.APP_NAME}} --region ${{env.AWS_REGION}} --version-label $AWS_VERSION_LABEL --source-bundle S3Bucket=${{env.S3_BUCKET}},S3Key=$S3_KEY --auto-create-application
+
+  deploy_aws:
+    needs: [create_eb_version]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up python 3.10.10 (needed for eb cli)
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.10.10
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+
+          echo "Installing Elastic Beanstalk Cli"
+          python -m pip install --upgrade pip
+          pip install awsebcli --upgrade
+          eb --version
+
+          echo "eb init"
+          eb init ${{env.APP_NAME}} -p ${{env.AWS_PLATFORM}} --region ${{env.AWS_REGION}}
+          echo "eb deploy"
+          eb deploy ${{env.ENV_NAME}} --version $AWS_VERSION_LABEL --timeout 20
+          echo "Deploy finished"
