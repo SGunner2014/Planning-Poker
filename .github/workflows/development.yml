@@ -1,7 +1,7 @@
 name: development-deployment
 
 env:
-  APP_NAME: "Planning poker"
+  APP_NAME: "planning-poker"
   ENV_NAME: "Planningpoker-env"
   S3_BUCKET: "elasticbeanstalk-us-east-1-448561077416"
   AWS_REGION: us-east-1
