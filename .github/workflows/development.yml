@@ -1,7 +1,7 @@
 name: poker-deployment
 
 env:
-  "S3_BUCKET_NAME": "poker-deployment"
+  "S3_BUCKET_NAME": "elasticbeanstalk-us-east-1-448561077416"
   "EBS_APPLICATION_NAME": "Planning poker"
   "EBS_ENVIRONMENT_NAME": "Planningpoker-env"
   "AWS_REGION": "us-east-1"
