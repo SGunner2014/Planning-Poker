@@ -25,12 +25,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - run: |
-          AWS_VERSION_LABEL="${{env.APP_NAME}}-${{env.PIPELINE_ID}}"
-
           echo "Creating source bundle"
           cd backend
           zip -r ${{env.APP_NAME}}.zip ./src Dockerfile package.json tsconfig.build.json yarn.lAWS_VERSION_LABELock tsconfig.json
-          S3_KEY="$AWS_VERSION_LABEL.zip"
+          S3_KEY="${{env.APP_NAME}}-${{env.PIPELINE_ID}}.zip"
 
           echo "Uploading source bundle to S3"
           aws s3 cp ${{env.APP_NAME}}.zip s3://${{env.S3_BUCKET}}/$S3_KEY
@@ -40,13 +38,13 @@ jobs:
           aws elasticbeanstalk create-application-version \
             --application-name ${{env.APP_NAME}} \
             --source-bundle S3Bucket=${{env.S3_BUCKET}},S3Key=$S3_KEY \
-            --version-label "$AWS_VERSION_LABEL" \
+            --version-label "${{env.APP_NAME}}-${{env.PIPELINE_ID}}" \
             --description "commit-sha-${{github.sha}}"
       - name: Deploy new application version
         run: |
           aws elasticbeanstalk update-environment \
             --environment-name ${{env.ENV_NAME}} \
-            --version-label "$AWS_VERSION_LABEL"
+            --version-label "${{env.APP_NAME}}-${{env.PIPELINE_ID}}"
       - name: Wait for deployment to finish
         run: |
           aws elasticbeanstalk wait environment-updated \
