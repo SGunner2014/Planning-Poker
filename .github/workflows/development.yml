@@ -25,8 +25,8 @@ jobs:
           node-version: "16"
       - name: Build the application
         run: |
-          npm install
-          npm run build
+          yarn install
+          yarn build
         working-directory: ${{env.working-directory}}
       - name: Zip the application
         run: zip -r ${{env.DEPLOY_PACKAGE_NAME}} ./ -x *.git*
