@@ -1,12 +1,11 @@
-name: development-deployment
+name: poker-deployment
 
 env:
-  APP_NAME: "planning-poker"
-  ENV_NAME: "Planningpoker-env"
-  S3_BUCKET: "elasticbeanstalk-us-east-1-448561077416"
-  AWS_REGION: us-east-1
-  AWS_PLATFORM: Docker
-  PIPELINE_ID: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+  "S3_BUCKET_NAME": "poker-deployment"
+  "EBS_APPLICATION_NAME": "Planning poker"
+  "EBS_ENVIRONMENT_NAME": "Planningpoker-env"
+  "AWS_REGION": "us-east-1"
+  "DEPLOY_PACKAGE_NAME": "poker-deployment-${{github.sha}}.zip"
 
 on:
   push:
@@ -14,37 +13,33 @@ on:
       - main
 
 jobs:
-  create_eb_version:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Configure AWS Credentials
+      - name: Clone repo
+        uses: actions/checkout@v3
+      - name: Build the application
+        run: |
+          npm install
+          npm run build
+      - name: Zip the application
+        run: zip -r ${{env.DEPLOY_PACKAGE_NAME}} ./ -x *.git*
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-      - run: |
-          echo "Creating source bundle"
-          cd backend
-          zip -r ${{env.APP_NAME}}.zip ./src Dockerfile package.json tsconfig.build.json yarn.lAWS_VERSION_LABELock tsconfig.json
-
-          echo "Uploading source bundle to S3"
-          aws s3 cp ${{env.APP_NAME}}.zip s3://${{env.S3_BUCKET}}/"${{env.APP_NAME}}-${{env.PIPELINE_ID}}.zip"
-
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{env.AWS_REGION}}
+      - name: Upload to S3
+        run: aws s3 cp ${{env.DEPLOY_PACKAGE_NAME}} s3://${{env.S3_BUCKET_NAME}}/
       - name: Create new application version
         run: |
           aws elasticbeanstalk create-application-version \
-            --application-name ${{env.APP_NAME}} \
-            --source-bundle S3Bucket=${{env.S3_BUCKET}},S3Key="${{env.APP_NAME}}-${{env.PIPELINE_ID}}.zip" \
-            --version-label "${{env.APP_NAME}}-${{env.PIPELINE_ID}}" \
+            --application-name ${{env.EBS_APPLICATION_NAME}} \
+            --source-bundle S3Bucket=${{env.S3_BUCKET_NAME}},S3Key=${{env.DEPLOY_PACKAGE_NAME}} \
+            --version-label "ver-${{github.sha}}" \
             --description "commit-sha-${{github.sha}}"
-      - name: Deploy new application version
-        run: |
-          aws elasticbeanstalk update-environment \
-            --environment-name ${{env.ENV_NAME}} \
-            --version-label "${{env.APP_NAME}}-${{env.PIPELINE_ID}}"
-      - name: Wait for deployment to finish
-        run: |
-          aws elasticbeanstalk wait environment-updated \
-            --environment-name ${{env.ENV_NAME}}
+      - name: Deploy new version
+        run: aws elasticbeanstalk update-environment --environment-name ${{env.EBS_ENVIRONMENT_NAME}} --version-label "ver-${{github.sha}}"
+      - name: Print success message on completion
+        run: echo "Deployment successful"
