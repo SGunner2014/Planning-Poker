@@ -56,10 +56,10 @@ jobs:
       - run: |
           AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
 
-          echo "Installing Elastic Beanstalk Cli"
-          python -m pip install --upgrade pip
-          pip install awsebcli --upgrade
-          eb --version
+          git clone https://github.com/aws/aws-elastic-beanstalk-cli-setup.git
+          python aws-elastic-beanstalk-cli-setup/scripts/ebcli_installer.py --location /tmp/eb
+          export PATH=/tmp/eb:$PATH
+          echo "eb --version"
 
           echo "eb init"
           eb init ${{env.APP_NAME}} -p ${{env.AWS_PLATFORM}} --region ${{env.AWS_REGION}}
