@@ -35,6 +35,7 @@ jobs:
           docker build -t ${{ env.ECR_REGISTRY }}:$GITHUB_SHA .
           docker push ${{ env.ECR_REGISTRY }}:$GITHUB_SHA
           echo "image=${{ env.ECR_REGISTRY }}:$GITHUB_SHA" >> $GITHUB_OUTPUT
+        working-directory: ${{ env.WORKING_DIRECTORY }}
       - name: Fill in the new image ID in the Amazon ECS task definition
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
