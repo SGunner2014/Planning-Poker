@@ -19,15 +19,6 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v3
-      - name: Use Node.js v16
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-      - name: Build the application
-        run: |
-          yarn install
-          yarn build
-        working-directory: ${{env.working-directory}}
       - name: Zip the application
         run: zip -r ${{env.DEPLOY_PACKAGE_NAME}} ./ -x *.git*
         working-directory: ${{env.working-directory}}
