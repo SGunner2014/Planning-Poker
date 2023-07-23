@@ -6,6 +6,7 @@ env:
   "EBS_ENVIRONMENT_NAME": "Planningpoker-env"
   "AWS_REGION": "us-east-1"
   "DEPLOY_PACKAGE_NAME": "poker-deployment-${{github.sha}}.zip"
+  "working-directory": "./backend"
 
 on:
   push:
@@ -22,8 +23,10 @@ jobs:
         run: |
           npm install
           npm run build
+        working-directory: ${{env.working-directory}}
       - name: Zip the application
         run: zip -r ${{env.DEPLOY_PACKAGE_NAME}} ./ -x *.git*
+        working-directory: ${{env.working-directory}}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -32,6 +35,7 @@ jobs:
           aws-region: ${{env.AWS_REGION}}
       - name: Upload to S3
         run: aws s3 cp ${{env.DEPLOY_PACKAGE_NAME}} s3://${{env.S3_BUCKET_NAME}}/
+        working-directory: ${{env.working-directory}}
       - name: Create new application version
         run: |
           aws elasticbeanstalk create-application-version \
