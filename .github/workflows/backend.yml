@@ -1,4 +1,4 @@
-name: poker-deployment
+name: Deploy backend to ECS
 
 env:
   ECR_REGISTRY: "448561077416.dkr.ecr.eu-west-2.amazonaws.com/planning-poker"
