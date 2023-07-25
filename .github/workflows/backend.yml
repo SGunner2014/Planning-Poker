@@ -1,0 +1,52 @@
+name: Deploy backend to ECS
+
+env:
+  ECR_REGISTRY: "448561077416.dkr.ecr.eu-west-2.amazonaws.com/planning-poker"
+  ECS_CLUSTER: "fargate-cluster"
+  ECS_SERVICE: "ecs-service"
+  ECS_TASK_DEFINITION: "./backend/task-definition.json"
+  ECS_CONTAINER_NAME: "planning-poker"
+  WORKING_DIRECTORY: "./backend"
+  AWS_REGION: "eu-west-2"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        run: |
+          docker build -t ${{ env.ECR_REGISTRY }}:$GITHUB_SHA .
+          docker push ${{ env.ECR_REGISTRY }}:$GITHUB_SHA
+          echo "image=${{ env.ECR_REGISTRY }}:$GITHUB_SHA" >> $GITHUB_OUTPUT
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
