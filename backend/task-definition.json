@@ -30,7 +30,7 @@
   ],
   "family": "planning-poker",
   "executionRoleArn": "arn:aws:iam::448561077416:role/ecsTaskExecutionRole",
-  "networkMode": "awsvpc",
+  "networkMode": "bridge",
   "revision": 1,
   "volumes": [],
   "status": "ACTIVE",
