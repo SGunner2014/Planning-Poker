@@ -8,6 +8,6 @@ ADD . /app
 
 ENV NODE_ENV=development
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["yarn", "start:dev"]

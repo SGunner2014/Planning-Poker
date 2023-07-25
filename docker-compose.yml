@@ -10,7 +10,7 @@ services:
       MYSQL_PORT: 3306
       MYSQL_DATABASE: "planning-poker"
     ports:
-      - 3001:3000
+      - 3001:80
     volumes:
       - ./backend:/app
       - /app/node_modules
