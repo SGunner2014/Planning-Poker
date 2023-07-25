@@ -6,11 +6,8 @@ RUN yarn
 
 ADD . /app
 
-
 ENV NODE_ENV=development
-
-RUN yarn build
 
 EXPOSE 3000
 
-CMD ["yarn", "start:prod"]
+CMD ["yarn", "start:dev"]
