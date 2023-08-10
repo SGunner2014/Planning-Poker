@@ -3,7 +3,7 @@ name: Deploy backend to ECS
 env:
   ECR_REGISTRY: "448561077416.dkr.ecr.eu-west-2.amazonaws.com/planning-poker"
   ECS_CLUSTER: "fargate-cluster"
-  ECS_SERVICE: "ecs-service"
+  ECS_SERVICE: "ecs-service-3"
   ECS_TASK_DEFINITION: "./backend/task-definition.json"
   ECS_CONTAINER_NAME: "planning-poker"
   WORKING_DIRECTORY: "./backend"
