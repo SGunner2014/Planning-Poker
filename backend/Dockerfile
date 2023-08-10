@@ -10,4 +10,6 @@ ENV NODE_ENV=development
 
 EXPOSE 3000
 
+RUN ls -l
+
 CMD ["yarn", "start:dev"]
