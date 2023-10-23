@@ -1,6 +1,6 @@
 FROM --platform=linux/amd64 node:16-alpine
 
-WORKDIR /app/frontend
+WORKDIR /app
 COPY . .
 RUN yarn
 
