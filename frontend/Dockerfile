@@ -1,10 +1,8 @@
 FROM --platform=linux/amd64 node:16-alpine
 
 WORKDIR /app
-ADD package.json /app/package.json
+COPY . .
 RUN yarn
-
-ADD . /app
 
 EXPOSE 3000
 
