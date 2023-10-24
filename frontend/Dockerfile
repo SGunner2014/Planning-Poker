@@ -1,9 +1,11 @@
 FROM --platform=linux/amd64 node:16-alpine
 
+ENV PORT 3000
+
 WORKDIR /app
 COPY . .
 RUN yarn
 
-EXPOSE 3000
+EXPOSE PORT
 
 CMD ["yarn", "dev"]

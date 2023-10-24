@@ -7,8 +7,9 @@ RUN yarn
 ADD . /app
 
 ENV NODE_ENV=development
+ENV PORT=80
 
-EXPOSE 80
+EXPOSE PORT
 
 RUN ls -l
 
