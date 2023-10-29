@@ -23,6 +23,8 @@ export class RoomGateway {
     @MessageBody() joinRoomDto: JoinRoomDto,
     @ConnectedSocket() client: Socket,
   ) {
+    console.log('join room', joinRoomDto);
+
     const [room, userId] = this.roomService.joinRoom(joinRoomDto, client);
     RoomService.broadcast(
       room.id,
@@ -45,6 +47,8 @@ export class RoomGateway {
     @MessageBody() createRoomDto: CreateRoomDto,
     @ConnectedSocket() client: Socket,
   ) {
+    console.log('create room', createRoomDto);
+
     const [room, userId] = this.roomService.createRoom(createRoomDto, client);
 
     return {
