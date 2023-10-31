@@ -14,14 +14,14 @@ CMD ["yarn", "start"]
 
 
 
-FROM --platform=linux/amd64 node:16-alpine AS development
+# FROM --platform=linux/amd64 node:16-alpine AS development
 
-ENV PORT 3000
+# ENV PORT 3000
 
-WORKDIR /app
-COPY . .
-RUN yarn
+# WORKDIR /app
+# COPY . .
+# RUN yarn
 
-EXPOSE PORT
+# EXPOSE PORT
 
-CMD ["yarn", "dev"]
+# CMD ["yarn", "dev"]
